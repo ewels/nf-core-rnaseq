@@ -1882,7 +1882,7 @@ def checkHostname(){
 
 def validateParameters(){
     // Set up function variables
-    def failed_validation = false
+    def validParams = true
 
     // Load parameters.settings.json file
     def jsonSlurper = new JsonSlurper()
@@ -1896,21 +1896,50 @@ def validateParameters(){
         expectedParams.push(it.name)
     }
 
-    // Loop through all params
+    // Check for any unexpected parameters
     params.each { param, val ->
         if(!expectedParams.contains(param)){
             log.error("Unexpected parameter `$param`")
-            failed_validation = true
+            validParams = false
         }
     }
 
     // Check that each given parameter is of the correct type
+    paramSettings.each {
+        try {
+            switch(it.type){
+                case 'string':
+                    params.(it.name) as String
+                    break
+                case 'boolean':
+                    assert params.(it.name) instanceof Boolean
+                    break
+                case 'integer':
+                    params.(it.name) as Integer
+                    break
+                case 'decimal':
+                    params.(it.name) as Decimal
+                    break
+                case 'mem unit':
+                    params.(it.name) as nextflow.util.MemoryUnit
+                    break
+            }
+        } catch (AssertionError | NumberFormatException e) {
+            // Allow null objects
+            if (params.(it.name) != null){
+                def paramsType = params.(it.name).getClass()
+                log.error("Parameter `$it.name` is wrong type! Should be $it.type, found $paramsType")
+                log.debug(e.getMessage())
+                validParams = false
+            }
+        }
+    }
 
-    if(failed_validation){
+    if(!validParams){
         log.error("Parameter validation failed!")
-        log.warn("For more information, please use the --help parameter or see https://nf-co.re/rnaseq/docs")
+        log.warn("For more information, please use the '--help' parameter or see https://nf-co.re/rnaseq/docs")
     } else {
         log.success("Paramater validation was a success")
     }
-    return false
+    return validParams
 }
