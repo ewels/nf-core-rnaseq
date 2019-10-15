@@ -8,6 +8,7 @@
  https://github.com/nf-core/rnaseq
 ----------------------------------------------------------------------------------------
 */
+import groovy.json.JsonSlurper
 
 def helpMessage() {
     log.info nfcoreHeader()
@@ -106,6 +107,11 @@ def helpMessage() {
 if (params.help) {
     helpMessage()
     exit 0
+}
+
+// Validate input parameters
+if (!validateParameters()){
+    exit 1
 }
 
 /*
@@ -469,7 +475,7 @@ process get_software_versions {
     """
 }
 
-compressedReference = hasExtension(params.fasta, 'gz') || hasExtension(params.transcript_fasta, 'gz') || hasExtension(params.star_index, 'gz') || hasExtension(params.hisat2_index, 'gz') 
+compressedReference = hasExtension(params.fasta, 'gz') || hasExtension(params.transcript_fasta, 'gz') || hasExtension(params.star_index, 'gz') || hasExtension(params.hisat2_index, 'gz')
 
 if(compressedReference){
   // This complex logic is to prevent accessing the genome_fasta_gz variable if
@@ -955,7 +961,7 @@ if (!params.removeRiboRNA){
 
         if (params.singleEnd) {
             """
-            gzip -d --force < ${reads} > all-reads.fastq 
+            gzip -d --force < ${reads} > all-reads.fastq
 
             sortmerna --ref ${Refs} \
                 --reads all-reads.fastq \
@@ -1045,7 +1051,7 @@ if (!params.skipAlignment){
           file "*SJ.out.tab"
           file "*Log.out" into star_log
           file "where_are_my_files.txt"
-          file "*Unmapped*" optional true 
+          file "*Unmapped*" optional true
           file "${prefix}Aligned.sortedByCoord.out.bam.bai" into bam_index_rseqc, bam_index_genebody
 
           script:
@@ -1115,7 +1121,7 @@ if (!params.skipAlignment){
           } else if (reverseStranded && !unStranded){
               rnastrandness = params.singleEnd ? '--rna-strandness R' : '--rna-strandness RF'
           }
-          
+
           if (params.singleEnd) {
               unaligned = params.saveUnaligned ? "--un-gz unmapped.hisat2.gz" : ''
               """
@@ -1568,7 +1574,7 @@ if (params.pseudo_aligner == 'salmon'){
         """
         }
 
-    
+
     process salmon_tx2gene {
       label 'low_memory'
       publishDir "${params.outdir}/salmon", mode: 'copy'
@@ -1872,4 +1878,39 @@ def checkHostname(){
             }
         }
     }
+}
+
+def validateParameters(){
+    // Set up function variables
+    def failed_validation = false
+
+    // Load parameters.settings.json file
+    def jsonSlurper = new JsonSlurper()
+    def paramSettingsFile = new File("$baseDir/parameters.settings.json")
+    def paramSettingsRaw = jsonSlurper.parseText(paramSettingsFile.text)
+    def paramSettings = paramSettingsRaw.parameters
+
+    // Collect expected parameter names
+    def expectedParams = []
+    paramSettings.each {
+        expectedParams.push(it.name)
+    }
+
+    // Loop through all params
+    params.each { param, val ->
+        if(!expectedParams.contains(param)){
+            log.error("Unexpected parameter `$param`")
+            failed_validation = true
+        }
+    }
+
+    // Check that each given parameter is of the correct type
+
+    if(failed_validation){
+        log.error("Parameter validation failed!")
+        log.warn("For more information, please use the --help parameter or see https://nf-co.re/rnaseq/docs")
+    } else {
+        log.success("Paramater validation was a success")
+    }
+    return false
 }
