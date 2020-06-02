@@ -4,24 +4,15 @@ name: nf-core CI
 on: [push, pull_request]
 
 jobs:
-  test:
+
+  setup:
+    name: Set up environment & Docker
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nxf_ver: ['19.10.0', '']
-        aligner: ["--aligner 'hisat2'", "--aligner 'star'", "--pseudo_aligner 'salmon'"]
-        options: ['--skipQC', '--remove_rRNA', '--saveUnaligned', '--skipTrimming', '--star_index false']
     steps:
-      - name: Check out code
+      - name: Check out pipeline code
         uses: actions/checkout@v2
 
-      - name: Install Nextflow
-        run: |
-          export NXF_VER=${{ matrix.nxf_ver }}
-          wget -qO- get.nextflow.io | bash
-          sudo mv nextflow /usr/local/bin/
-
-      - name: Has Docker / Conda changed?
+      - name: Check if Docker / Conda changed
         uses: technote-space/get-diff-action@v1
         with:
           PREFIX_FILTER: |
@@ -33,10 +24,26 @@ jobs:
         run: docker build . -t nfcore/rnaseq:dev
 
       - name: Pull docker image
-        if: !env.GIT_DIFF
+        if: ! env.GIT_DIFF
         run: |
           docker pull nfcore/rnaseq:dev
           docker tag nfcore/rnaseq:dev nfcore/rnaseq:dev
+
+  test:
+    name: Run workflow tests
+    needs: setup
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nxf_ver: ['19.10.0', '']
+        aligner: ["--aligner 'hisat2'", "--aligner 'star'", "--pseudo_aligner 'salmon'"]
+        options: ['--skipQC', '--remove_rRNA', '--saveUnaligned', '--skipTrimming', '--star_index false']
+    steps:
+      - name: Install Nextflow
+        run: |
+          export NXF_VER=${{ matrix.nxf_ver }}
+          wget -qO- get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
 
       - name: Basic workflow tests
         run: |
