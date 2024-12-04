@@ -73,8 +73,8 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Set up Nextflow
-        uses: nf-core/setup-nextflow@v2
+      - name: Set up Nextflow test
+        uses: nf-core/setup-nextflow@action-subfolder-composite
         with:
           version: "${{ matrix.NXF_VER }}"
 
