@@ -74,7 +74,7 @@ jobs:
           java-version: "17"
 
       - name: Set up Nextflow test
-        uses: nf-core/setup-nextflow@action-subfolder-composite-dist
+        uses: nf-core/setup-nextflow@simple-bash-action
         with:
           version: "${{ matrix.NXF_VER }}"
 
