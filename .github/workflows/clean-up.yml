@@ -1,24 +1,16 @@
+# This workflow is managed centrally in nf-core/actions.
+# Do not edit — all logic, updates and security fixes arrive automatically via the v1 tag.
 name: "Close user-tagged issues and PRs"
 on:
   schedule:
     - cron: "0 0 * * 0" # Once a week
 
+permissions: {}
+
 jobs:
-  clean-up:
-    runs-on: ubuntu-latest
+  run:
+    uses: nf-core/actions/.github/workflows/clean-up.yml@v1
     permissions:
       issues: write
       pull-requests: write
-    steps:
-      - uses: actions/stale@b5d41d4e1d5dceea10e7104786b73624c18a190f # v10
-        with:
-          stale-issue-message: "This issue has been tagged as awaiting-changes or awaiting-feedback by an nf-core contributor. Remove stale label or add a comment otherwise this issue will be closed in 20 days."
-          stale-pr-message: "This PR has been tagged as awaiting-changes or awaiting-feedback by an nf-core contributor. Remove stale label or add a comment if it is still useful."
-          close-issue-message: "This issue was closed because it has been tagged as awaiting-changes or awaiting-feedback by an nf-core contributor and then staled for 20 days with no activity."
-          days-before-stale: 30
-          days-before-close: 20
-          days-before-pr-close: -1
-          any-of-labels: "awaiting-changes,awaiting-feedback"
-          exempt-issue-labels: "WIP"
-          exempt-pr-labels: "WIP"
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+    secrets: inherit
