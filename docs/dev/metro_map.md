@@ -7,29 +7,19 @@ pip install 'nf-metro>=0.5.4' cairosvg
 
 # Static SVG + PNG
 nf-metro render assets/metro_map.mmd \
-  -o docs/images/nf-core-rnaseq_metro_map_grey.svg \
-  --theme light --x-spacing 60 --y-spacing 40 \
-  --no-straight-diamonds \
-  --logo docs/images/nf-core-rnaseq_logo_light.png
+  --diamond-style symmetric \
+  -o docs/images/nf-core-rnaseq_metro_map.svg \
+  -o docs/images/nf-core-rnaseq_metro_map.png
+  -o docs/usage/differential_expression_analysis/img/nf-core-rnaseq_metro_map.png
 
-python -c "import cairosvg; cairosvg.svg2png(
-    url='docs/images/nf-core-rnaseq_metro_map_grey.svg',
-    write_to='docs/images/nf-core-rnaseq_metro_map_grey.png', output_width=2265)"
-
-# Animated SVG (used in README)
+# Animated SVG (used in manifest + README)
 nf-metro render assets/metro_map.mmd \
-  -o docs/images/nf-core-rnaseq_metro_map_grey_animated.svg \
-  --theme light --x-spacing 60 --y-spacing 40 --animate \
-  --no-straight-diamonds \
-  --logo docs/images/nf-core-rnaseq_logo_light.png
-
-# Copy static PNG to docs subdir
-cp docs/images/nf-core-rnaseq_metro_map_grey.png \
-  docs/usage/differential_expression_analysis/img/
+  --animate --diamond-style symmetric \
+  -o docs/images/nf-core-rnaseq_metro_map_animated.svg
 
 # Ensure trailing newlines on SVGs (required by pre-commit)
-for f in docs/images/nf-core-rnaseq_metro_map_grey.svg \
-         docs/images/nf-core-rnaseq_metro_map_grey_animated.svg; do
+for f in docs/images/nf-core-rnaseq_metro_map.svg \
+         docs/images/nf-core-rnaseq_metro_map_animated.svg; do
   sed -i '' -e '$a\' "$f"
 done
 ```
