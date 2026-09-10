@@ -5,13 +5,13 @@ The pipeline overview metro map is generated from `assets/metro_map.mmd` using [
 ```bash
 pip install 'nf-metro>=2.0.0'
 
-# Static SVG + PNG
+# Static SVG + dark-mode PNG
 nf-metro render assets/metro_map.mmd \
   -o docs/images/nf-core-rnaseq_metro_map.svg \
   -o docs/images/nf-core-rnaseq_metro_map_dark.png \
   -o docs/usage/differential_expression_analysis/img/nf-core-rnaseq_metro_map.svg
 
-# Static light-mode PNG (mmd defaults to style dark)
+# Static light-mode PNG
 nf-metro render assets/metro_map.mmd --mode light \
   -o docs/images/nf-core-rnaseq_metro_map_light.png
 
