@@ -25,7 +25,7 @@
 
 ![nf-core/rnaseq metro map](docs/images/nf-core-rnaseq_metro_map_animated.svg)
 
-> In case the image above is not loading, please have a look at the [static version](docs/images/nf-core-rnaseq_metro_map.png).
+> In case the image above is not loading, please have a look at the [static version](docs/images/nf-core-rnaseq_metro_map_light.png).
 
 1. Merge re-sequenced FastQ files ([`cat`](http://www.linfo.org/cat.html))
 2. Auto-infer strandedness by subsampling and pseudoalignment ([`fq`](https://github.com/stjude-rust-labs/fq), [`Salmon`](https://combine-lab.github.io/salmon/))

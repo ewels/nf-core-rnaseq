@@ -9,8 +9,13 @@ pip install 'nf-metro>=0.5.4' cairosvg
 nf-metro render assets/metro_map.mmd \
   --diamond-style symmetric \
   -o docs/images/nf-core-rnaseq_metro_map.svg \
-  -o docs/images/nf-core-rnaseq_metro_map.png
-  -o docs/usage/differential_expression_analysis/img/nf-core-rnaseq_metro_map.png
+  -o docs/images/nf-core-rnaseq_metro_map_dark.png \
+  -o docs/usage/differential_expression_analysis/img/nf-core-rnaseq_metro_map.svg
+
+# Static light-mode PNG (mmd defaults to style dark)
+nf-metro render assets/metro_map.mmd \
+  --diamond-style symmetric --mode light \
+  -o docs/images/nf-core-rnaseq_metro_map_light.png
 
 # Animated SVG (used in manifest + README)
 nf-metro render assets/metro_map.mmd \
